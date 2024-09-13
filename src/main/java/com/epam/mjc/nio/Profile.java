@@ -3,21 +3,20 @@ package com.epam.mjc.nio;
 import java.util.Objects;
 
 public class Profile {
+    private final String name;
+    private final Integer age;
+    private final String email;
+    private final Long phone;
 
-    private String name;
-    private Integer age;
-    private String email;
-    private Long phone;
-
-    public Profile() {
-
-    }
     public Profile(String name, Integer age, String email, Long phone) {
         this.name = name;
         this.age = age;
         this.email = email;
         this.phone = phone;
     }
+    // getters only
+}
+
 
     public String getName() {
         return name;
@@ -32,8 +31,12 @@ public class Profile {
     }
 
     public void setAge(Integer age) {
-        this.age = age;
+    if (age < 0) {
+        throw new IllegalArgumentException("Age cannot be negative");
     }
+    this.age = age;
+}
+
 
     public String getEmail() {
         return email;
@@ -63,19 +66,16 @@ public class Profile {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        Profile profile = (Profile) o;
-        return getName().equals(profile.getName())
-                && getAge().equals(profile.getAge())
-                && getEmail().equals(profile.getEmail())
-                && getPhone().equals(profile.getPhone());
-    }
+public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    Profile profile = (Profile) o;
+    return Objects.equals(name, profile.name) &&
+           Objects.equals(age, profile.age) &&
+           Objects.equals(email, profile.email) &&
+           Objects.equals(phone, profile.phone);
+}
+
 
     @Override
     public int hashCode() {
