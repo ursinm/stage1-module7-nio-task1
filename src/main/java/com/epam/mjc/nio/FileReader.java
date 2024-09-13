@@ -1,35 +1,43 @@
 package com.epam.mjc.io;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.io.File;
+import java.io.IOException;
+import java.util.stream.Stream;
 
 public class FileReader {
-
+    
     public Profile getDataFromFile(File file) {
-        Map<String, String> profileData = new HashMap<>();
-        
-        try {
-            List<String> lines = Files.readAllLines(file.toPath(), StandardCharsets.UTF_8);
-            for (String line : lines) {
-                if (line.contains(": ")) {
-                    String[] keyValue = line.split(": ", 2);
-                    if (keyValue.length == 2) {
-                        profileData.put(keyValue[0], keyValue[1].trim());
+        Profile profile = new Profile();
+
+        try (Stream<String> lines = Files.lines(Paths.get(file.toURI()))) {
+            lines.forEach(line -> {
+                String[] parts = line.split(": ");
+                if (parts.length == 2) {
+                    String key = parts[0].trim();
+                    String value = parts[1].trim();
+                    switch (key) {
+                        case "Name":
+                            profile.setName(value);
+                            break;
+                        case "Age":
+                            profile.setAge(Integer.parseInt(value));
+                            break;
+                        case "Email":
+                            profile.setEmail(value);
+                            break;
+                        case "Phone":
+                            profile.setPhone(value);
+                            break;
                     }
                 }
-            }
-
-            String name = profileData.get("Name");
-            Integer age = Integer.parseInt(profileData.get("Age"));
-            String email = profileData.get("Email");
-            Long phone = Long.parseLong(profileData.get("Phone"));
-
-            return new Profile(name, age, email, phone);
+            });
         } catch (IOException e) {
-            System.err.println("Error occurred while reading the file: " + e.getMessage());
-            return null;
-        } catch (NumberFormatException e) {
-            System.err.println("Error in data format: " + e.getMessage());
-            return null;
+            e.printStackTrace();
         }
+
+        return profile;
     }
 }
